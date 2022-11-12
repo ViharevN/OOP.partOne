@@ -35,7 +35,11 @@ public class Main {
         System.out.println(audi.toString());
         audi.changeTyres();
         System.out.println(audi.toString());
-        audi.
+        audi.setRegNumber(null);
+        System.out.println(audi.toString());
+        audi.setRegNumber("x112xx000");
+        System.out.println(audi.toString());
+
 
     }
 }
