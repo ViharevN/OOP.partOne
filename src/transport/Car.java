@@ -1,5 +1,8 @@
 package transport;
 
+
+import java.time.LocalDate;
+
 public class Car {
     private String brand;// марка авто
     private String model;// модель авто
@@ -13,11 +16,13 @@ public class Car {
     private String regNumber; //Регистрационный номер
     private Boolean summerTyres; //признак «Летняя» или «Зимняя резина
 
-
-
+    private Key key;
+    private Insurance insurance;
 
     public Car(String brand, String model, Integer year, String country, String bodyType, Integer numOfSeats,
-               Double engineVolume, String color, String transmission, String regNumber, Boolean summerTyres) {
+               Double engineVolume, String color, String transmission, String regNumber, Boolean summerTyres,
+               Key key, Insurance insurance) {
+
         if (brand == null || brand.isBlank() || brand.isEmpty()) {
             this.brand = "default";
         } else {
@@ -73,9 +78,18 @@ public class Car {
         } else {
             this.summerTyres = this.summerTyres;
         }
+        if (key == null) {
+            this.key = new Key();
+        } else {
+            this.key = key;
+        }
+        this.insurance = new Insurance();
 
 
+    }
 
+    public Insurance getInsurance() {
+        return insurance;
     }
 
     public String getBrand() {
@@ -100,6 +114,10 @@ public class Car {
 
     public Integer getNumOfSeats() {
         return numOfSeats;
+    }
+
+    public void setRegNumber(String regNumber) {
+        this.regNumber = regNumber;
     }
 
     public double getEngineVolume() {
@@ -142,13 +160,27 @@ public class Car {
         return regNumber;
     }
 
-    public String setRegNumber(String regNumber) {
-        if (regNumber == null || regNumber.length() < 9 || regNumber.isEmpty() || regNumber.isBlank()) {
-            this.regNumber = "не верно введен номер";
-        } else {
-            this.regNumber = regNumber;
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
+    }
+
+    public boolean isCorrectNumber() {
+        if (regNumber.length() != 9) {
+            return false;
         }
-        return regNumber;
+        char[] chars = regNumber.toCharArray();
+        if (!Character.isAlphabetic(chars[0])||!Character.isAlphabetic(chars[4])
+                || !Character.isAlphabetic(chars[5])) {
+            return false;
+        }
+        return Character.isDigit(chars[1]) && Character.isDigit(chars[2])
+                && Character.isDigit(chars[3]) && Character.isDigit(chars[6])
+                && Character.isDigit(chars[7]) && Character.isDigit(chars[8]);
+
     }
 
     public Boolean getSummerTyres() {
@@ -177,6 +209,93 @@ public class Car {
                 ", Цвет: " + color +
                 ", Коробка передач: " + transmission +
                 ", Регистрационный номер: " + regNumber +
-                ", Шины: " + summerTyres;
+                ", Шины: " + summerTyres +
+                ", key: " + key;
     }
+
+    public static class Key {
+        private final boolean remoteEngineStart;
+        private final boolean keylessAccess;
+
+        public Key(boolean remoteEngineStart, boolean keylessAccess) {
+            this.remoteEngineStart = remoteEngineStart;
+            this.keylessAccess = keylessAccess;
+        }
+        public Key(){
+            this(false, false);
+        }
+
+        public boolean isRemoteEngineStart() {
+            return remoteEngineStart;
+        }
+
+        public boolean isKeylessAccess() {
+            return keylessAccess;
+        }
+
+        @Override
+        public String toString() {
+            return " Удаленный запуск: " + remoteEngineStart +
+                    ", Бесключевой доступ: " + keylessAccess;
+        }
+
+    }
+    public static class Insurance {
+        private final LocalDate expireDate;
+        private final double cost;
+        private final String number;
+
+        public Insurance(LocalDate expireDate, double cost, String number) {
+            if (expireDate == null) {
+                this.expireDate = LocalDate.now().plusDays(365);
+            } else {
+                this.expireDate = expireDate;
+            }
+            this.cost = cost;
+            if (number == null) {
+                this.number = "123456789";
+            } else {
+                this.number = number;
+            }
+        }
+
+        public Insurance() {
+            this(LocalDate.now(), 10_000, "123456789");
+        }
+
+        public LocalDate getExpireDate() {
+            return expireDate;
+        }
+
+        public double getCost() {
+            return cost;
+        }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public void checkExpireDate() {
+            if (expireDate.isBefore(LocalDate.now())||expireDate.isEqual(LocalDate.now())) {
+                System.out.println("Нужно срочно ехать оформлять новую страховку");
+            }
+
+        }
+        public void checkNumber() {
+            if (number.length() != 9) {
+                System.out.println("Номер страховки не верный");
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Дата " + expireDate +
+                    ", Цена " + cost +
+                    ", Номер'" + number;
+        }
+    }
+
+
+
+
 }
